@@ -49,20 +49,68 @@
 
 ## 安装
 
-### 方式一：Trae 插件市场（推荐）
+> ⚠️ **当前状态：尚未上架 Trae 官方插件市场。** 本项目处于开发阶段，需通过以下手动方式安装。后续上架插件市场后会更新此文档。
 
-在 Trae IDE 的插件市场搜索 "Watch Video" 并安装。
+### 方式一：手动安装（当前唯一方式）
 
-### 方式二：手动安装
+#### 步骤 1：克隆仓库
 
 ```bash
 git clone https://github.com/JACKWang19559/trae-funasr-watch.git
-# 将 watch/0.2.0 目录复制到 Trae 的插件目录
+```
+
+#### 步骤 2：定位 Trae 插件目录
+
+Trae 的插件存放路径因平台而异：
+
+| 平台 | 路径 |
+|------|------|
+| Windows | `C:\Users\<用户名>\.trae-cn\plugins\` |
+| macOS | `~/.trae-cn/plugins/` |
+| Linux | `~/.trae-cn/plugins/` |
+
+#### 步骤 3：将插件放入 Trae 插件目录
+
+将仓库中的 `watch/0.2.0/` 整个目录复制到 Trae 插件目录下。例如 Windows：
+
+```powershell
+# 复制到 Trae 插件目录（需按实际路径调整）
+Copy-Item -Path "trae-funasr-watch\watch\0.2.0" -Destination "$env:USERPROFILE\.trae-cn\plugins\trae-funasr-watch\" -Recurse
+```
+
+或将其作为独立插件包放在自定义路径下，Trae 会自动扫描识别。
+
+#### 步骤 4：重启 Trae IDE
+
+重启后，插件会被 Trae 自动加载。可在 Trae 的插件管理界面确认是否出现 "Watch Video"。
+
+#### 步骤 5：安装依赖
+
+首次使用前需安装 Python 依赖（在系统 Python 中执行，非 Trae 自带的 Python）：
+
+```bash
+pip install yt-dlp funasr torch
+# GPU 加速（可选，NVIDIA 显卡用户推荐）
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+```
+
+并确保 `ffmpeg` / `ffprobe` 可用：
+
+```bash
+# Windows
+winget install Gyan.FFmpeg
+# macOS
+brew install ffmpeg
 ```
 
 ### 初始化
 
-首次使用时，插件会自动运行 `setup.py` 检测依赖、创建 `~/.config/watch/.env` 配置文件，并在 Windows 上自动检测含 FunASR 的系统 Python 路径。
+首次在 Trae 中调用 `watch` 时，插件会自动运行 `setup.py --json`：
+- 检测 `ffmpeg` / `ffprobe` / `yt-dlp` 是否可用
+- 在 Windows 上自动检测含 FunASR 的系统 Python 路径
+- 创建 `~/.config/watch/.env` 配置文件（权限 0600）
+
+如检测到缺失依赖，会输出对应的安装命令提示。
 
 ## Windows + Trae 环境说明
 
