@@ -23,7 +23,7 @@
 
 ### 🍪 多平台 Cookie 支持
 
-- 动态识别 URL 域名（Bilibili / 抖音 / YouTube）
+- 动态识别 URL 域名（Bilibili / 抖音 ）
 - 支持 Netscape 格式 `cookies.txt` 和 JSON 格式 `cookies.json`
 - 自动选择对应平台的 Cookie 源，解决登录/会员视频下载问题
 
