@@ -7,6 +7,11 @@ __pycache__/
 # 用户配置与敏感信息（含 cookies、.env）
 .config/
 
+# 真实配置文件（.env.example 可以提交，.env 不可以）
+.env
+.env.local
+*.env
+
 # 工作目录产物
 *.wav
 *.mp4
