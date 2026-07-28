@@ -1,0 +1,31 @@
+{
+  "name": "trae-funasr-watch-market",
+  "owner": {
+    "name": "JACKWang19559",
+    "url": "https://github.com/JACKWang19559"
+  },
+  "plugins": [
+    {
+      "name": "watch",
+      "source": "./",
+      "description": "AI 视频理解插件：yt-dlp 下载 + ffmpeg 抽帧 + FunASR 本地转写（SenseVoiceSmall）",
+      "version": "0.2.0",
+      "author": {
+        "name": "JACKWang19559",
+        "url": "https://github.com/JACKWang19559"
+      },
+      "keywords": [
+        "video",
+        "funasr",
+        "sensevoice",
+        "transcription",
+        "bilibili",
+        "douyin",
+        "youtube",
+        "yt-dlp",
+        "ffmpeg"
+      ],
+      "license": "MIT"
+    }
+  ]
+}
