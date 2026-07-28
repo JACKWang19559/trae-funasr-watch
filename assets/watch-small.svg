@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Watch Video">
+  <defs>
+    <linearGradient id="bg" x1="8" x2="56" y1="8" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9f1239"/>
+      <stop offset="1" stop-color="#881337"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <circle cx="32" cy="32" r="18" fill="none" stroke="#ffffff" stroke-width="3.5"/>
+  <path d="M27 23 L42 32 L27 41 Z" fill="#ffffff"/>
+</svg>

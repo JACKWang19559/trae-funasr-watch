@@ -1,0 +1,25 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 用户配置与敏感信息（含 cookies、.env）
+.config/
+
+# 工作目录产物
+*.wav
+*.mp4
+*.mkv
+*.webm
+*.mov
+
+# 临时文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
