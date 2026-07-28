@@ -1,20 +1,20 @@
 {
   "name": "watch",
   "version": "0.2.0",
-  "description": "Watch a video (URL or local path) — downloads with yt-dlp, extracts auto-scaled frames with ffmpeg, pulls transcript from captions or Whisper API fallback, then hands frames + transcript to the agent so it can answer questions about what's in the video.",
+  "description": "Watch a video (URL or local path) — downloads with yt-dlp, extracts auto-scaled frames with ffmpeg, pulls transcript from captions or FunASR local transcription fallback, then hands frames + transcript to the agent so it can answer questions about what's in the video.",
   "author": {
-    "name": "bradautomates",
-    "url": "https://github.com/bradautomates/claude-video"
+    "name": "JACKWang19559",
+    "url": "https://github.com/JACKWang19559"
   },
-  "homepage": "https://github.com/bradautomates/claude-video",
-  "repository": "https://github.com/bradautomates/claude-video",
+  "homepage": "https://github.com/JACKWang19559/trae-funasr-watch",
+  "repository": "https://github.com/JACKWang19559/trae-funasr-watch",
   "license": "MIT",
   "keywords": [
     "video",
     "watch",
     "yt-dlp",
     "ffmpeg",
-    "whisper",
+    "funasr",
     "transcription",
     "frames",
     "multimodal"
@@ -23,15 +23,15 @@
   "interface": {
     "displayName": "Watch Video",
     "shortDescription": "Watch a video and answer questions about its content",
-    "longDescription": "Gives the agent a video input: downloads with yt-dlp, extracts auto-scaled frames with ffmpeg, pulls a timestamped transcript from native captions (with Whisper API fallback), then reads the frames and combines them with the transcript to answer questions about what's in the video. Works with YouTube, Vimeo, X, TikTok, Twitch clips, local files, and most yt-dlp-supported sources.",
-    "developerName": "bradautomates",
+    "longDescription": "Gives the agent a video input: downloads with yt-dlp, extracts auto-scaled frames with ffmpeg, pulls a timestamped transcript from native captions (with FunASR local transcription fallback), then reads the frames and combines them with the transcript to answer questions about what's in the video. Works with YouTube, Vimeo, X, TikTok, Twitch clips, local files, and most yt-dlp-supported sources.",
+    "developerName": "JACKWang19559",
     "category": "development_tools",
     "capabilities": [
       "Interactive",
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/bradautomates/claude-video",
+    "websiteURL": "https://github.com/JACKWang19559/trae-funasr-watch",
     "defaultPrompt": "Watch this video and tell me what's in it: <paste-url-or-path>",
     "brandColor": "#E11D48",
     "screenshots": [],
