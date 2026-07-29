@@ -15,7 +15,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from config import frame_cap, get_config  # noqa: E402
+from config import detect_trae_workspace, frame_cap, get_config, get_work_dir  # noqa: E402
 from download import download, fetch_captions, is_url  # noqa: E402
 from frames import MAX_FPS, auto_fps, auto_fps_focus, extract_at_timestamps, extract_keyframes, extract_scene_or_uniform, format_time, get_metadata, merge_frames, parse_time, parse_timestamps  # noqa: E402
 from transcribe import filter_range, format_transcript, parse_vtt  # noqa: E402
@@ -48,7 +48,14 @@ def main() -> int:
     )
     ap.add_argument("--start", type=str, default=None, help="Range start (SS, MM:SS, or HH:MM:SS)")
     ap.add_argument("--end", type=str, default=None, help="Range end (SS, MM:SS, or HH:MM:SS)")
-    ap.add_argument("--out-dir", type=str, default=None, help="Working directory (default: tmp)")
+    ap.add_argument(
+        "--out-dir",
+        type=str,
+        default=None,
+        help="Working directory for all intermediate files (video, frames, audio, transcript). "
+             "建议指向用户项目根目录（如 <project>/.watch-work），避免工作文件散落到 C 盘插件目录。"
+             "默认：<WATCH_WORK_DIR>/.watch-work/<timestamp> 或 <脚本所在目录>/.watch-work/<timestamp>",
+    )
     ap.add_argument(
         "--no-whisper",
         action="store_true",
@@ -77,10 +84,21 @@ def main() -> int:
     if args.out_dir:
         work = Path(args.out_dir).expanduser().resolve()
     else:
-        # 默认在用户当前工作目录下创建 .watch-work/<时间戳> 子目录
-        # 避免把工作文件散落到 C 盘 Temp 目录
+        # 工作目录根的自动检测优先级：
+        # 1. WATCH_WORK_DIR 环境变量/.env 配置（用户显式指定）
+        # 2. SAFE_RM_ALLOWED_PATH 自动检测 Trae 用户项目根目录（自动）
+        # 3. Path.cwd()（脚本所在目录，最后回退）
+        # 这样工作文件会自动生成在用户项目根目录下，而不是 C 盘插件目录。
+        configured_work_dir = get_work_dir()
+        trae_workspace = detect_trae_workspace()
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        work = Path.cwd() / ".watch-work" / timestamp
+        if configured_work_dir:
+            work_root = Path(configured_work_dir).expanduser().resolve()
+        elif trae_workspace:
+            work_root = Path(trae_workspace).resolve()
+        else:
+            work_root = Path.cwd()
+        work = work_root / ".watch-work" / timestamp
     work.mkdir(parents=True, exist_ok=True)
     print(f"[watch] working dir: {work}", file=sys.stderr)
 

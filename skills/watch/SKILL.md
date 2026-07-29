@@ -126,6 +126,19 @@ py ./scripts/watch.py "<source>"
 "<watch_python>" ./scripts/watch.py "<source>"
 ```
 
+**工作目录自动检测**：watch.py 会自动检测用户项目根目录作为工作目录根，无需手动传 `--out-dir`。检测优先级：
+1. `--out-dir` 参数（最高优先级，显式指定）
+2. `WATCH_WORK_DIR` 环境变量/`.env` 配置（用户自定义）
+3. `SAFE_RM_ALLOWED_PATH` 自动检测 Trae 用户项目根目录（自动）
+4. `Path.cwd()`（脚本所在目录，最后回退）
+
+工作文件会自动生成在 `<工作目录根>/.watch-work/<时间戳>/` 下，包含视频、帧、音频和字幕文件。
+
+**自定义工作目录（可选）**：如果用户希望工作文件生成在特定目录，可在 `~/.config/watch/.env` 中设置：
+```
+WATCH_WORK_DIR=D:\my-project
+```
+
 Optional flags:
 - `--detail transcript|efficient|balanced|token-burner` — fidelity/speed dial.
 - `--start T` / `--end T` — focus on a section. Accepts `SS`, `MM:SS`, or `HH:MM:SS`. When either is set, fps auto-scales denser.
@@ -133,7 +146,7 @@ Optional flags:
 - `--max-frames N` — override the preset cap for tighter token budget (e.g. `--max-frames 40`)
 - `--resolution W` — change frame width in px (default 512; bump to 1024 only if the user needs to read on-screen text)
 - `--fps F` — override auto-fps (clamped to 2 fps max)
-- `--out-dir DIR` — keep working files somewhere specific (default: `.watch-work/<timestamp>` under the current working directory)
+- `--out-dir DIR` — explicitly set working directory for all intermediate files (overrides auto-detection). 默认自动检测：`<WATCH_WORK_DIR 或 Trae 工作区>/.watch-work/<timestamp>`。
 - `--no-whisper` — disable the FunASR transcription fallback entirely (frames-only if no captions)
 - `--no-dedup` — keep near-duplicate frames. By default a frame-delta pass drops frames that are visually near-identical to the previous kept one.
 
@@ -238,8 +251,8 @@ If you already watched a video this session and the user asks a follow-up, do **
 - Runs `yt-dlp` locally to download the video and pull native captions when the source supports them (public data; the request goes directly to whatever host the URL points at)
 - Runs `ffmpeg` / `ffprobe` locally to extract frames as JPEGs and, when transcription is needed, a mono 16 kHz audio clip
 - Runs FunASR locally to transcribe the extracted audio — **no data leaves the machine** (completely offline after model download)
-- Writes the downloaded video, frames, audio, and an intermediate transcript to a working directory under the current working directory (`.watch-work/<timestamp>`, or `--out-dir` if specified) so the agent can `Read` them
-- Reads / creates `~/.config/watch/.env` (mode `0600`) to store configuration (`WATCH_TRANSCRIBE_DEVICE`, `WATCH_PYTHON`, `WATCH_DETAIL`) and a `SETUP_COMPLETE` marker. As a fallback, also reads `.env` in the current working directory
+- Writes the downloaded video, frames, audio, and an intermediate transcript to a working directory (`.watch-work/<timestamp>` under the auto-detected Trae workspace, `WATCH_WORK_DIR`, `--out-dir`, or the script directory) so the agent can `Read` them
+- Reads / creates `~/.config/watch/.env` (mode `0600`) to store configuration (`WATCH_TRANSCRIBE_DEVICE`, `WATCH_PYTHON`, `WATCH_DETAIL`, `WATCH_WORK_DIR`) and a `SETUP_COMPLETE` marker. As a fallback, also reads `.env` in the current working directory
 
 **What this skill does NOT do:**
 - Does not upload the video or audio to any external API — all transcription happens locally with FunASR

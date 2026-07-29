@@ -60,6 +60,14 @@ WATCH_TRANSCRIBE_DEVICE=auto
 # 由 setup.py 自动检测并写入，无需手动编辑。
 # WATCH_PYTHON=C:\\Users\\...\\python.exe
 
+# 工作目录根路径（watch 插件产生的所有中间文件都会放在这里）
+# 不设置时默认使用脚本所在目录（可能在 C 盘插件目录下）。
+# 设置后，工作文件会生成在 <WATCH_WORK_DIR>/.watch-work/<时间戳>/ 下。
+# 建议设置为用户项目根目录，例如：
+#   WATCH_WORK_DIR=D:\\my-project
+#   WATCH_WORK_DIR=C:\\Users\\Administrator\\Documents\\my-project
+# WATCH_WORK_DIR=
+
 # Default watch behavior (the /watch first-run wizard sets this for you).
 # Allowed values: transcript | efficient | balanced | token-burner
 # Keep the value on its own line with no trailing comment.
