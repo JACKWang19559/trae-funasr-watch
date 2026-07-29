@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-import tempfile
+import datetime
 from pathlib import Path
 
 
@@ -77,7 +77,10 @@ def main() -> int:
     if args.out_dir:
         work = Path(args.out_dir).expanduser().resolve()
     else:
-        work = Path(tempfile.mkdtemp(prefix="watch-"))
+        # 默认在用户当前工作目录下创建 .watch-work/<时间戳> 子目录
+        # 避免把工作文件散落到 C 盘 Temp 目录
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        work = Path.cwd() / ".watch-work" / timestamp
     work.mkdir(parents=True, exist_ok=True)
     print(f"[watch] working dir: {work}", file=sys.stderr)
 
@@ -366,7 +369,7 @@ def main() -> int:
 
     print()
     print("---")
-    print(f"_Work dir: `{work}` — delete when done._")
+    print(f"_Work dir: `{work}` — delete when done (or run `Remove-Item -Recurse -Force .watch-work`)._")
 
     return 0
 

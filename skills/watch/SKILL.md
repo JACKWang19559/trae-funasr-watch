@@ -133,7 +133,7 @@ Optional flags:
 - `--max-frames N` — override the preset cap for tighter token budget (e.g. `--max-frames 40`)
 - `--resolution W` — change frame width in px (default 512; bump to 1024 only if the user needs to read on-screen text)
 - `--fps F` — override auto-fps (clamped to 2 fps max)
-- `--out-dir DIR` — keep working files somewhere specific (default: an auto-generated tmp dir)
+- `--out-dir DIR` — keep working files somewhere specific (default: `.watch-work/<timestamp>` under the current working directory)
 - `--no-whisper` — disable the FunASR transcription fallback entirely (frames-only if no captions)
 - `--no-dedup` — keep near-duplicate frames. By default a frame-delta pass drops frames that are visually near-identical to the previous kept one.
 
@@ -238,7 +238,7 @@ If you already watched a video this session and the user asks a follow-up, do **
 - Runs `yt-dlp` locally to download the video and pull native captions when the source supports them (public data; the request goes directly to whatever host the URL points at)
 - Runs `ffmpeg` / `ffprobe` locally to extract frames as JPEGs and, when transcription is needed, a mono 16 kHz audio clip
 - Runs FunASR locally to transcribe the extracted audio — **no data leaves the machine** (completely offline after model download)
-- Writes the downloaded video, frames, audio, and an intermediate transcript to a working directory under the system temp dir (or `--out-dir` if specified) so the agent can `Read` them
+- Writes the downloaded video, frames, audio, and an intermediate transcript to a working directory under the current working directory (`.watch-work/<timestamp>`, or `--out-dir` if specified) so the agent can `Read` them
 - Reads / creates `~/.config/watch/.env` (mode `0600`) to store configuration (`WATCH_TRANSCRIBE_DEVICE`, `WATCH_PYTHON`, `WATCH_DETAIL`) and a `SETUP_COMPLETE` marker. As a fallback, also reads `.env` in the current working directory
 
 **What this skill does NOT do:**
