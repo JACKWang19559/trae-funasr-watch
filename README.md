@@ -172,9 +172,34 @@ watch $URL --detail transcript
 | `--max-frames N` | 覆盖模式默认的帧数上限 |
 | `--resolution W` | 帧宽度（默认 512px，需读取屏幕文字时可调到 1024） |
 | `--fps F` | 覆盖自动帧率（上限 2 fps） |
-| `--out-dir DIR` | 指定工作目录（默认：系统临时目录） |
+| `--out-dir DIR` | 显式指定工作目录（默认：自动检测，详见「工作目录自动检测」） |
 | `--no-whisper` | 禁用 FunASR 转写回退（无字幕时仅返回帧） |
 | `--no-dedup` | 保留近似重复帧 |
+
+### 工作目录自动检测
+
+watch.py 会按以下**四级优先级**自动确定工作目录根，所有中间文件（视频、帧、音频、字幕）都会生成在 `<工作目录根>/.watch-work/<时间戳>/` 下，避免散落到 C 盘插件目录或系统临时目录：
+
+| 优先级 | 来源 | 说明 |
+|--------|------|------|
+| 1（最高） | `--out-dir DIR` 参数 | 命令行显式指定，覆盖一切 |
+| 2 | `WATCH_WORK_DIR` 环境变量 / `.env` 配置 | 可选的手动覆盖 |
+| 3 | `SAFE_RM_ALLOWED_PATH` 环境变量 | **自动**：Trae 启动时设置，第一个路径即用户项目根目录（默认行为） |
+| 4（回退） | `Path.cwd()` | 脚本所在目录，最后兜底 |
+
+**Trae 用户无需任何配置**：插件默认读取 Trae 设置的 `SAFE_RM_ALLOWED_PATH` 环境变量，自动识别用户当前打开的项目根目录，把工作文件放在 `<项目根>/.watch-work/<时间戳>/` 下。这是推荐用法，无需在 `.env` 中设置 `WATCH_WORK_DIR`。
+
+**特殊情况下的手动覆盖**：仅在以下场景才需要设置 `WATCH_WORK_DIR`：
+- 不在 Trae 环境中运行（`SAFE_RM_ALLOWED_PATH` 不存在，自动检测失效）
+- 想把工作文件统一放到其他磁盘位置
+
+在 `~/.config/watch/.env` 中设置：
+
+```ini
+WATCH_WORK_DIR=D:\my-project
+```
+
+工作目录创建后会在 stderr 输出 `[watch] working dir: <路径>`，方便定位。
 
 ## 配置
 
@@ -193,6 +218,11 @@ WATCH_PYTHON=C:\Users\<user>\AppData\Local\Programs\Python\Python311\python.exe
 # Cookie 文件路径（用于下载登录/会员视频）
 WATCH_COOKIE_FILE=C:\Users\<user>\.config\watch\cookies.txt
 
+# 工作目录根（可选，通常无需设置）
+# 留空 = 自动检测 Trae 用户项目根目录（推荐）
+# 仅需覆盖自动检测时才设置，如 WATCH_WORK_DIR=D:\my-project
+# WATCH_WORK_DIR=
+
 # 安装完成标记
 SETUP_COMPLETE=true
 ```
@@ -208,7 +238,7 @@ SETUP_COMPLETE=true
 ## 项目结构
 
 ```
-watch/0.2.0/
+watch/0.3.0/
 ├── .trae-plugin/
 │   └── plugin.json              # Trae 插件清单
 ├── assets/
@@ -217,7 +247,7 @@ watch/0.2.0/
 │   └── watch/
 │       ├── SKILL.md             # 技能契约文档
 │       └── scripts/
-│           ├── watch.py         # 主入口
+│           ├── watch.py         # 主入口（工作目录自动检测）
 │           ├── setup.py         # 环境检测与初始化
 │           ├── download.py      # yt-dlp 下载封装
 │           ├── frames.py        # ffmpeg 抽帧
@@ -225,7 +255,7 @@ watch/0.2.0/
 │           ├── funasr_transcribe.py  # FunASR 本地转写
 │           ├── whisper.py       # FunASR 薄封装（向后兼容）
 │           ├── ffmpeg_utils.py  # ffmpeg 路径解析
-│           ├── config.py        # .env 读取
+│           ├── config.py        # .env 读取 + Trae 工作区检测
 │           └── build-skill.sh   # 构建脚本
 └── README.md                    # 本文档
 ```
@@ -251,7 +281,8 @@ watch/0.2.0/
 - **`setup.py`** — 新增 `_find_python_with_funasr()` 等函数，自动检测含 FunASR 的系统 Python（绕过 Trae 自带的 Python 3.10），使用 `importlib.util.find_spec` 快速检测
 - **`funasr_transcribe.py`** — 新模块，实现 FunASR + SenseVoiceSmall 本地转写，支持 GPU/CPU 自动切换、VAD 分段、时间戳输出、标签过滤
 - **`whisper.py`** — 简化为薄封装，委托给 `funasr_transcribe.transcribe_video()`
-- **`watch.py`** — 新增 `transcript.txt` 保存功能
+- **`watch.py`** — 新增 `transcript.txt` 保存功能；新增**工作目录自动检测**（四级优先级：`--out-dir` > `WATCH_WORK_DIR` > `SAFE_RM_ALLOWED_PATH` 自动检测 Trae 工作区 > `Path.cwd()`），工作文件自动生成在用户项目根目录的 `.watch-work/<时间戳>/` 下，不再散落到 C 盘插件目录
+- **`config.py`** — 新增 `detect_trae_workspace()` 函数，读取 Trae 启动时设置的 `SAFE_RM_ALLOWED_PATH` 环境变量自动定位用户项目根目录
 - **`ffmpeg_utils.py`** — 新模块，解析 Windows 上完整版 ffmpeg 路径（绕过 Trae 自带的精简版）
 - **`download.py`** — 支持 SRT 字幕，基于 URL 域名动态选择 Cookie 源
 - **`transcribe.py`** — 支持 SRT 格式解析
@@ -271,7 +302,7 @@ watch/0.2.0/
 
 ### 日志位置
 
-- 工作目录：`%TEMP%\watch-<random>\`（包含 video.mp4、frames/、audio.wav、transcript.txt）
+- 工作目录：`<用户项目根>/.watch-work/<时间戳>/`（自动检测，包含 video.mp4、frames/、audio.wav、transcript.txt）。也可通过 `WATCH_WORK_DIR` 或 `--out-dir` 显式指定。
 - 配置文件：`~/.config/watch/.env`
 
 ## 技术栈
